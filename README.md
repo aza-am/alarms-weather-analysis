@@ -31,3 +31,21 @@ A web scraping tool built with "BeautifulSoup"
 
   * Automatically generates URLs and scrapes daily report titles from the **Institute for the Study of War**
   * Extracts the relevant "<title>" tags and saves the collected intelligence data into a CSV format
+
+
+<br>
+<br>
+Additionally 
+
+This repository includes advanced data sources and historical processing modules to enhance the model's predictive capabilities
+
+telegram_scraper.py
+ 
+A specialized module using the Telethon API for real-time monitoring 
+
+ * For long-term data collection to build a unique dataset
+ * Saves data in CSV format with utf-8-sig encoding for Ukrainian language support
+
+
+isw_historical_data.py
+A robust historical scraping tool designed for dataset initialization
