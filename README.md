@@ -25,7 +25,7 @@ A script that integrates with the **Visual Crossing API**
   * Extracts the granular hourly data array and saves it locally as a JSON file for time-series alignment
 
 
-.py
+daily_isw.py
 
 A web scraping tool built with "BeautifulSoup"
 
