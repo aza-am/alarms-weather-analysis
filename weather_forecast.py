@@ -1,5 +1,6 @@
 import requests
 import json
+import csv
 
 API_KEY = "YOUR_API_KEY"
 CITY = "Kyiv"
@@ -23,5 +24,12 @@ hourly_forecast = hours[:24]
 
 with open("weather_forecast_24h.json", "w") as f:
     json.dump(hourly_forecast, f, indent=4)
+
+with open("weather_forecast_next24h.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    headers = hourly_forecast[0].keys()
+    writer.writerow(headers)
+    for hour in hourly_forecast:
+        writer.writerow(hour.values())
 
 print("24-hour forecast saved!")
