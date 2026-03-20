@@ -8,20 +8,16 @@ BASE = "https://understandingwar.org"
 
 headers = {
     "User-Agent": "Mozilla/5.0"
-    # для "безпечного скрапінгу' сайту, щоб не заблокували
 }
 
 START_DATE = datetime(2022, 2, 24)
-END_DATE = datetime(2026, 3, 1)
+END_DATE = datetime(2026, 3, 16)
 
-#--------------------1)Збирання лінків з сайту----------------------------------------------------------
+#--------------------1)Collecting links from the website----------------------------------------------------------
 
 links = []
 
-for page in range(1, 59):
-    #найперша потрібна дата знаходиться на 58й сторінці, так як збір відбувається 1 раз, то можна брати саме таку кількість сторінок, 
-    # АЛЕ якщо  запускати цей код в інші дні то треба перевіряти на якій сторінці подія з датою 24.02.2022 щоб взяти всі події з потрібного інтервалу
-    #за логікою можна брати і всі сторінки що є, але нащо зайвий раз перевіряти купу непотрібних лінків, якщо дані збираються 1 раз
+for page in range(1, 65):
 
     url = f"{BASE}/research/?_teams=russia-ukraine&_paged={page}"
     print("Scanning page --> ", page)
@@ -30,7 +26,7 @@ for page in range(1, 59):
     soup = BeautifulSoup(req.text, "html.parser")
 
     articles = soup.select("h3.research-card-title a")
-                            #усі потрібні силки на події загорнуті саме в цей заголовок / клас
+                            
     if not articles:
         break
 
@@ -38,21 +34,17 @@ for page in range(1, 59):
         links.append(a["href"])
 
     time.sleep(0.5)
-          #щоб запити приходили через якийсь проміжок часу, а не всі одразу
+          
 
 print("Total links:", len(links))
 
 
-#-------------------------2)Збирання інформації з кожного лінка-------------------------------------------------------
+#-------------------------2)Collecting data from each link-------------------------------------------------------
 
-#data = []
-
-
-with open("isw_historical_data.csv", "w", newline="", encoding="utf-8") as f:
+with open("isw_data.csv", "w", newline="", encoding="utf-8") as f:
 
     writer = csv.writer(f)
     writer.writerow(["url", "date", "text"])
-
 
     for link in links:
 
@@ -76,80 +68,24 @@ with open("isw_historical_data.csv", "w", newline="", encoding="utf-8") as f:
         if not (START_DATE <= date_obj <= END_DATE):
             continue
 
-        # toplines = soup.find("div", id="toplines")
-        # text = ""
-        # if toplines:
-        #     first = toplines.find("strong")
-        #     if first:
-        #         text = first.get_text(strip=True)  --> не всюди є топлайн тому не завжди працює
+        title = soup.find("h1").get_text(strip=True)   
 
-        # text = ""
+        
+        content = soup.find("div", class_="dynamic-entry-content")
+        if content:
+            for tag in content(["script", "style", "img", "figure", "noscript"]):
+                tag.extract()
 
-        # first_strong = soup.find("strong")
-        # if first_strong:
-        #     text = first_strong.get_text(strip=True) --> іноді перший p це і є тайтл + дата, а нам це не треба
+            text = content.get_text(separator=" ", strip=True)
+        else:
+            text = ""
 
-
-        text = ""
-
-        def is_valid_paragraph(candidate, min_len=80):
-            skip_words = ["Click here", "map", "ISW", "interactive", "archive", "Note"]
-            
-            if len(candidate) < min_len:
-                return False
-            if "." not in candidate:
-                return False
-            for word in skip_words:
-                if word in candidate:
-                    return False
-            return True
-
-        toplines = soup.find("div", id="toplines")
-        if toplines:
-            strong = toplines.find("strong")
-            if strong:
-                text = strong.get_text(strip=True)
-
-        if not text:
-            content = soup.find("div", class_="entry-content")
-            if content:
-                paragraphs = content.find_all("p")
-            else:
-                paragraphs = soup.find_all("p")
-
-            for p in paragraphs:
-                strong = p.find("strong")
-                candidate = strong.get_text(strip=True) if strong else p.get_text(strip=True)
-                if is_valid_paragraph(candidate, 200):
-                    text = candidate
-                    break
-
-            if not text:
-                for p in paragraphs:
-                    strong = p.find("strong")
-                    candidate = strong.get_text(strip=True) if strong else p.get_text(strip=True)
-                    if is_valid_paragraph(candidate, 80):
-                        text = candidate
-                        break
-
-
-
-        writer.writerow([link, date, text])
+        writer.writerow([link, date, title, text])
 
         f.flush()
 
         print("--> Saved")
 
         time.sleep(0.01)
-
-# with open("war_reports.csv", "w", newline="", encoding="utf-8") as f:
-
-#     fieldnames = ["url", "date", "text"]
-
-#     writer = csv.DictWriter(f, fieldnames=fieldnames)
-
-#     writer.writeheader()
-#     writer.writerows(data)  --> погана всерія, 
-#                              бо краще записувати дані одразу в файл як тільки ми відкриваємо лінк, а не після проходження всіх лінків
 
 print("--> CSV file ready and saved")
