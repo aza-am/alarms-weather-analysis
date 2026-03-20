@@ -4,7 +4,6 @@ import time
 import csv
 from datetime import datetime, timedelta
 
-#весь код ппереважно взятий з іншого -> historical_data_isw.py
 
 BASE = "https://understandingwar.org"
 
@@ -14,7 +13,7 @@ headers = {"User-Agent": "Mozilla/5.0"}
 today = datetime.now()
 yesterday = today - timedelta(days=1)
 
-today_str = today.strftime("%B %d, %Y").replace(" 0", " ")   #саме в такому форматі дати на сайті
+today_str = today.strftime("%B %d, %Y").replace(" 0", " ")   #exact format of the dates on the website
 yesterday_str = yesterday.strftime("%B %d, %Y").replace(" 0", " ")
 
 
@@ -37,7 +36,7 @@ with open(file, "w", newline="", encoding="utf-8") as f:
     
 
     writer = csv.writer(f)
-    writer.writerow(["url", "date", "text"])
+    writer.writerow(["url", "date", "title", "text"])
 
 
     for link in links:
@@ -53,39 +52,21 @@ with open(file, "w", newline="", encoding="utf-8") as f:
         if date != today_str and date != yesterday_str:
             continue
 
-        text = ""
-
-        toplines = soup.find("div", id="toplines")
-
-        if toplines:
-            strong = toplines.find("strong")
-            if strong:
-                text = strong.get_text(strip=True)
-
-        if not text:
-
-            content = soup.find("div", class_="entry-content")
-
-            if content:
-                paragraphs = content.find_all("p")
-            else:
-                paragraphs = soup.find_all("p")
-
-            for p in paragraphs:
-
-                strong = p.find("strong")
-
-                if strong:
-                    candidate = strong.get_text(strip=True)
-
-                    if len(candidate) < 200:
-                        continue
-
-                    text = candidate
-                    break
+        title = soup.find("h1").get_text(strip=True)   
 
 
-        writer.writerow([link, date, text])
+        content = soup.find("div", class_="dynamic-entry-content")
+        if content:
+            
+            for tag in content(["script", "style", "img", "figure", "noscript"]):
+                tag.extract()
+
+            text = content.get_text(separator=" ", strip=True)
+        else:
+            text = ""
+
+
+        writer.writerow([link, date, title, text])
         f.flush()
         time.sleep(1)
 
