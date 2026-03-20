@@ -44,7 +44,7 @@ print("Total links:", len(links))
 with open("isw_data.csv", "w", newline="", encoding="utf-8") as f:
 
     writer = csv.writer(f)
-    writer.writerow(["url", "date", "text"])
+    writer.writerow(["url", "date", "title", "text"])
 
     for link in links:
 
