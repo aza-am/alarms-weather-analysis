@@ -35,7 +35,9 @@ This is probably the most rigorous and honest metric in machine learning. It tak
 
 
 
-Conclusion:
+***Conclusion***:
+
+
 Random Forest demonstrated the highest vigilance, but at the cost of excessive false positives and high computational costs. This made it an excellent baseline, but less efficient for real-world deployment.
 
 The neural network (MLP) turned out to be the most selective model with the highest accuracy, but its use in a security system is unacceptable. The rate of missed alarms indicates the network’s tendency to ignore threats that tree-based architectures consistently recognize.
