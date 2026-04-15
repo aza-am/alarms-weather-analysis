@@ -33,12 +33,7 @@ Unlike regular Accuracy, this metric calculates the arithmetic average between t
 
 This is probably the most rigorous and honest metric in machine learning. It takes into account all four cells of the error matrix simultaneously: +1 means perfect prediction, 0 means random guessing, -1 means complete mismatch. (An MCC above 0.4–0.5 in our complex topic is a good result, as it proves the presence of a strong statistical relationship between our 227 features and the real danger.)
 
-
-
-
-
-
-
+<br>
 ***Conclusion***:
 
 
